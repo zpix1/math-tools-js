@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Jacobi symbol</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+        />
+    </head>
+    <!-- code taken from here http://math.fau.edu/richman/jacobi.htm -->
+    <script>
+        var out = "";
+        function jacobi(a) {
+            var b = new Object();
+            b[0] = 1;
+            b[1] = 1;
+            b[2] = 1;
+            var sign = a[0];
+            var m = a[1];
+            var n = a[2];
+            if (sign > 0) out += "(" + m + "/" + n + ") = ";
+            if (sign < 0) out += "-(" + m + "/" + n + ") = ";
+            if (m > n - 1) {
+                m = m % n;
+                if (sign > 0) out += "(" + m + "/" + n + ") = ";
+                if (sign < 0) out += "-(" + m + "/" + n + ") = ";
+            }
+            m = m % n;
+            if (m == 0) {
+                out += "0";
+                return 0;
+            }
+            if (m == 1) {
+                if (sign > 0) {
+                    out += "1";
+                    return 1;
+                }
+                out += "-1";
+                return -1;
+            }
+            var J2n = 1;
+            if (3 == n % 8 || 5 == n % 8) J2n = -1;
+            if (0 == m % 2) {
+                b[0] = J2n * sign;
+                b[1] = m / 2;
+                b[2] = n;
+                return jacobi(b);
+            }
+            if (3 == n % 4 && 3 == m % 4) {
+                b[0] = -sign;
+                b[1] = n % m;
+                b[2] = m;
+                return jacobi(b);
+            } else {
+                b[0] = sign;
+                b[1] = n % m;
+                b[2] = m;
+                return jacobi(b);
+            }
+        }
+
+        function go_handler(m, n) {
+            if (0 == n % 2) {
+                alert("The bottom number must be odd");
+                return;
+            }
+            if (n < 0 || m < 0) {
+                alert("No negative numbers please");
+                return;
+            }
+            var a = new Object();
+            a[0] = 1;
+            a[1] = m;
+            a[2] = n;
+            out += "<HTML><HEAD><TITLE>Output</TITLE></HEAD><BODY>";
+            var ans = jacobi(a);
+            out += "<BR>";
+            if (ans == 1 && n < 30000) {
+                res = false;
+                for (var i = 1; i < n / 2; i++) {
+                    if (0 == (i * i - m) % n) {
+                        res = true;
+                        out +=
+                            "A residue: " +
+                            m +
+                            " = " +
+                            i +
+                            "&sup2 mod " +
+                            n +
+                            "<BR><BR>";
+                        break;
+                    }
+                }
+                if (res == false) out += "Not a residue<BR><BR>";
+            }
+            out += "</BODY></HTML>";
+            return out;
+        }
+        function runJacobi() {
+            var a = document.getElementById("num1").value;
+            var b = document.getElementById("num2").value;
+            out = "";
+            go_handler(a, b);
+            document.getElementById("ansDiv").innerHTML = out;
+        }
+    </script>
+    <body class="bg-gray">
+        <div class="section section-hero bg-gray">
+            <div class="grid-hero container grid-lg" id="overview">
+                <h2>Quadratic reciprocity</h2>
+                The Jacobi symbol, (<i>m/n</i>), is defined whenever <i>n</i> is
+                an odd number. It has the following properties that enable it to
+                be easily computed.
+                <ul>
+                    <li>
+                        (<i>a/n</i>) = (<i>b/n</i>) if <i>a</i> = <i>b</i> mod
+                        <i>n</i>.
+                    </li>
+                    <li>(1/<i>n</i>) = 1 and (0/<i>n</i>) = 0.</li>
+                    <li>
+                        (2<i>m</i>/<i>n</i>) = (<i>m/n</i>) if <i>n</i> =
+                        &plusmn;1 mod 8. Otherwise (2<i>m/n</i>) =
+                        <sub>&macr</sub>(<i>m/n</i>).
+                    </li>
+
+                    <li>
+                        (<b>Quadratic reciprocity</b>) If <i>m</i> and
+                        <i>n</i> are both odd, then (<i>m/n</i>) = (<i>n/m</i>)
+                        unless both <i>m</i> and <i>n</i> are congruent to 3 mod
+                        4, in which case (<i>m/n</i>) =
+                        <sub>&macr</sub>(<i>n/m</i>).
+                    </li>
+                </ul>
+
+                If <i>n</i> is a prime, then (<i>m/n</i>) = 1 exactly when
+                <i>m</i> is a nonzero square mod <i>n</i> (a quadratic residue).
+                <div class="container text-center">
+                    <input type="number" id="num1" min="0" /><br />
+                    <input type="number" id="num2" min="0" /><br /><br />
+                    <input
+                        type="button"
+                        id="calc"
+                        value="calculate"
+                        onclick="runJacobi()"
+                    />
+                    <div id="ansDiv"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
