@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>EGCD/Diaf solver</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+        />
+    </head>
+    <script>
+         function egcd(a, b) { 
+
+if (b == 0) {
+  return [1, 0, a];
+}
+
+temp = egcd(b, a % b);
+x = temp[0];
+y = temp[1];
+d = temp[2];
+return [y, x-y*Math.floor(a/b), d];
+}
+        function solve(a, b, c) {
+            var out = "<h2>" + a + 'x + ' + b + 'y = ' + c + '</h2>';
+            var egcdRes = egcd(a,b);
+            console.log(a,b);
+            console.log(egcdRes);
+            var d = egcd(Math.abs(a),Math.abs(b))[2];
+            out += 'gcd of ' + a + ' and ' + b + ' = ' + d + '<br>';
+            out += egcdRes[0] + '*a + ' + egcdRes[1] + '*b = 1<br>';
+            if (c % d != 0) {
+                out += 'gcd do not divide c, equation can not be solved'
+                return out;
+            }
+            var x0 = egcdRes[0] * c;
+            var y0 = egcdRes[1] * c;
+            out += 'x0 = ' + x0 + '<br>';
+            out += 'y0 = ' + y0 + '<br>';
+            if (b < 0)
+                out += 'x = ' + x0 + ' + ' + -b + '*t<br>';
+            else
+                out += 'x = ' + x0 + ' - ' + b + '*t<br>';
+            if (a < 0)
+                out += 'y = ' + y0 + ' - ' + -a + '*t<br>';
+            else
+                out += 'y = ' + y0 + ' + ' + a + '*t<br>';
+            return out;
+        }
+        function runSolve() {
+            var a = document.getElementById("a").value;
+            var b = document.getElementById("b").value;
+            var c = document.getElementById("c").value;
+            var ans = solve(a, b, c);
+            document.getElementById("outDiv").innerHTML = ans;
+        }
+    </script>
+    <body class="bg-gray">
+        <div class="section section-hero bg-gray">
+            <div class="grid-hero container grid-lg" id="overview">
+                <h2>Diofantine equation solver</h2>
+                <div class="container text-center">
+                    <label>a=</label><input type="number" id="a" /><br />
+                    b=<input type="number" id="b" /><br />
+                    c=<input type="number" id="c" /><br />
+                    <input
+                        type="button"
+                        id="calc"
+                        value="calculate"
+                        onclick="runSolve()"
+                    />
+                    <div id="outDiv"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
